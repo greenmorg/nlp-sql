@@ -1,0 +1,5 @@
+pgvector==0.2.5
+pydantic==2.7.3
+python-dotenv==1.0.1
+SQLAlchemy[asyncio]==2.0.30
+asyncpg
