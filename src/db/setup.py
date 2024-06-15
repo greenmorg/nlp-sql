@@ -10,9 +10,33 @@ from vectorized_postgres_engine import *
 
 load_dotenv()
 
-logger = logging.getLogger()
+
+def setup_logging(logger_name: str | None = None) -> logging.Logger:
+    """
+    Setup the logging for the application.
+
+    Arguments:
+        path: str - The path to save the log file.
+
+    Returns:
+        logging.Logger - The logger to use.
+    """
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s %(message)s',
+                        datefmt='%m-%d %H:%M:%S',
+                        )
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logger = logging.getLogger(logger_name)
+    logger.addHandler(console)
+    return logger
+
+logger = setup_logging()
 
 async def main(): 
+    logger.info("Read env vars...")
     host = os.environ.get("HOST")
     port = os.environ.get("PORT")
     user = os.environ.get("USER")
@@ -23,14 +47,20 @@ async def main():
         user = "admin"
     if not db_name:
         db_name = "database_schema"
+    logger.info("DONE.")
+    logger.info("Starting DB initialization...")
     engine_params = EngineParams(host=host, port=port, user=user, password=password, db_name=db_name)
     engine = get_vectorized_postgres_engine(engine_params)
 
+
     async with engine.begin() as conn:
         logger.info("Enabling the pgvector extension for Postgres...")
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         logger.info("Creating database tables and indexes...")
         await conn.run_sync(Base.metadata.create_all)
+    
+    await engine.dispose()
+    logger.info("The database was successfuly created, motherfucker")
 
 
 if __name__ == "__main__":
