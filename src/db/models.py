@@ -1,13 +1,37 @@
 from __future__ import annotations
-
+import os
 from dataclasses import asdict
 
 from pgvector.sqlalchemy import Vector
 
-from sqlalchemy import Index
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column, sessionmaker, Session
 
-from vectorized_postgres_engine import get_vectorized_postgres_engine
+from dotenv import load_dotenv
+
+from . import schemas
+from .vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
+from ..utils.tokenizer import encode, decode
+
+load_dotenv()
+
+HOST = os.environ.get("DB_HOST")
+PORT = os.environ.get("DB_PORT")
+USER = os.environ.get("DB_USER")
+PASSWORD = os.environ.get("DB_PASSWORD")
+DB_NAME = os.environ.get("DB_NAME")
+
+engine_params = EngineParams(host=HOST, port=PORT, user=USER, password=PASSWORD, db_name=DB_NAME)
+engine = get_vectorized_postgres_engine(engine_params)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, class_=AsyncSession)
+
+async def get_db():
+    async with SessionLocal() as session:
+        try:
+            yield session
+        finally:
+            session.close()
+
 
 EMBEDDING_SHAPE = 8192
 
@@ -16,9 +40,20 @@ class Base(DeclarativeBase, MappedAsDataclass):
 
 class DBEmbedding(Base):
     __tablename__ = "db_embeddings"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column()
     embeddings: Mapped[Vector] = mapped_column(Vector(EMBEDDING_SHAPE))
 
     def to_dict(self):
         return asdict(self)
+    
+async def create_embedding(db: AsyncSession, embedding: schemas.EmbeddingSchema):
+    db_embedding = DBEmbedding(**embedding.dict())
+    if (current_shape := len(db_embedding.embeddings)) < EMBEDDING_SHAPE:
+        remain = EMBEDDING_SHAPE - current_shape
+        db_embedding.embeddings += [0.0] * remain
+    db.add(db_embedding)
+    await db.commit()
+    # db.refresh()
+    return db_embedding
+

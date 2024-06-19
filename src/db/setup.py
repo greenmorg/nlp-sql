@@ -60,7 +60,7 @@ async def main():
         await conn.run_sync(Base.metadata.create_all)
     
     await engine.dispose()
-    logger.info("The database was successfuly created, motherfucker")
+    logger.info("The database was successfuly created")
 
 
 if __name__ == "__main__":

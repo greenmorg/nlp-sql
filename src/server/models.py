@@ -14,9 +14,10 @@ class DatabaseDetails(BaseModel):
     def to_connection_string(self):
         return f"{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name}"
     
-class AddSchemaDetails(BaseModel):
-    content: str
 
-class RequestSchema(BaseModel):
+class SchemaBase(BaseModel):
     name: str
     content: str
+
+class AddSchema(SchemaBase):
+    pass
