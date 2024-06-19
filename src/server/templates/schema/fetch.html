@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Schema</title>
+</head>
+<body>
+    <h1>Database Schema</h1>
+    <textarea id="schema" rows="20" cols="80" readonly>{{ schema }}</textarea><br>
+    <button id="copyButton">Copy Schema</button>
+    <form action="/schema/add" method="post">
+        <input type="hidden" id="schema_input" name="schema" value="{{ schema }}">
+        <button type="submit">Add Schema</button>
+    </form>
+
+    <script>
+        document.getElementById("copyButton").addEventListener("click", function() {
+            const schemaText = document.getElementById("schema");
+            schemaText.select();
+            schemaText.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand("copy");
+            alert("Schema copied to clipboard!");
+        });
+    </script>
+</body>
+</html>
