@@ -10,3 +10,4 @@ Proof of concept implementation of low-code/no-code data insgiht extractor
 - [x] Schema embedding insertion to vector storage
 - [ ] Implement vector search for schemas with cosine sim
 - [ ] Connect OpenAI model(s) to create a SQL prompt with respect to retrieved tables
+- [ ] (OPITONAL) Containerization
