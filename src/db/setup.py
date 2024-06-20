@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from models import *
 from vectorized_postgres_engine import *
 
+from src.utils.tokenizer import EMBEDDING_SHAPE
+
 load_dotenv()
 
 
@@ -37,11 +39,12 @@ logger = setup_logging()
 
 async def main(): 
     logger.info("Read env vars...")
-    host = os.environ.get("HOST")
-    port = os.environ.get("PORT")
-    user = os.environ.get("USER")
-    password = os.environ.get("PASSWORD")
+    host = os.environ.get("DB_HOST")
+    port = os.environ.get("DB_PORT")
+    user = os.environ.get("DB_USER")
+    password = os.environ.get("DB_PASSWORD")
     db_name = os.environ.get("DB_NAME")
+    print(host, port, user, password, db_name)
     if not (host and port): raise ValueError("The host and port should not be empty. Check you env file, please!")
     if not user:
         user = "admin"
@@ -58,6 +61,7 @@ async def main():
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         logger.info("Creating database tables and indexes...")
         await conn.run_sync(Base.metadata.create_all)
+        logger.info(f"EMBEDDING_DIM = {EMBEDDING_SHAPE}")
     
     await engine.dispose()
     logger.info("The database was successfuly created")

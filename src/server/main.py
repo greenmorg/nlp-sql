@@ -5,14 +5,16 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import OperationalError
 
 from .models import *
 from ..db.models import get_db, DBEmbedding, create_embedding
 from ..db.schemas import EmbeddingSchema
+from ..db.search import Searcher, EmbeddingSearchResult, StringSearchResult
 from ..utils.fetcher import fetch_full_schema
-from ..utils.tokenizer import encode, decode, per_byte_decoding
+from ..utils.tokenizer import text_to_embedding, embedding_to_text
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -66,10 +68,33 @@ def add_schema(request: Request, schema: str = Form(...)):
 
 @app.post("/schema/add/submit")
 async def submit_schema(request: Request, name: str = Form(...), content: str = Form(...), db: AsyncSession = Depends(get_db)):
-    tokens = encode(content)
+    tokens = text_to_embedding(content)
+    print()
+    print(f'tokens: {tokens}, lenght: {len(tokens)}')
+    print()
     embedding_schema = EmbeddingSchema(name=name, embeddings=tokens)
-    db_embedding = await create_embedding(db=db, embedding=embedding_schema)        
-    
+    db_embedding = await create_embedding(db=db, embedding=embedding_schema)    
+    # TODO: redirect    
     return {"message": "Success"}
 
-    
+@app.get("/schemas", response_class=HTMLResponse)
+async def get_schemas(request: Request, db: AsyncSession = Depends(get_db)):
+    schema_names = await db.execute(select(DBEmbedding.name).distinct())
+    options_html = ''.join([f'<option value="{schema.name}">{schema.name}</option>' for schema in schema_names])
+    return HTMLResponse(content=options_html)
+
+
+@app.get("/search")
+async def get_search_page(request: Request):
+    return templates.TemplateResponse("search.html", {"request": request})
+
+@app.post("/search")
+async def get_search_results(request: Request, schema_name: str = Form(...), user_prompt: str = Form(...), db: AsyncSession = Depends(get_db)):
+    searcher = Searcher(db)
+    similar_schemas: list[EmbeddingSearchResult] = await searcher.search(user_prompt)
+    print(f'similar schemas: {similar_schemas}')
+    similar_schemas: list[StringSearchResult] = [e.to_string_result() for e in similar_schemas]
+    return {
+        "schemas": [{"content": s.content} for s in similar_schemas]
+    }
+

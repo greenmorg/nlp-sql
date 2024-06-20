@@ -9,9 +9,9 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_co
 
 from dotenv import load_dotenv
 
-from . import schemas
-from .vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
-from ..utils.tokenizer import encode, decode
+from src.db import schemas
+from src.db.vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
+from src.utils.tokenizer import broadcast, EMBEDDING_SHAPE
 
 load_dotenv()
 
@@ -30,10 +30,8 @@ async def get_db():
         try:
             yield session
         finally:
-            session.close()
+            await session.close()
 
-
-EMBEDDING_SHAPE = 8192
 
 class Base(DeclarativeBase, MappedAsDataclass):
     pass
@@ -49,9 +47,6 @@ class DBEmbedding(Base):
     
 async def create_embedding(db: AsyncSession, embedding: schemas.EmbeddingSchema):
     db_embedding = DBEmbedding(**embedding.dict())
-    if (current_shape := len(db_embedding.embeddings)) < EMBEDDING_SHAPE:
-        remain = EMBEDDING_SHAPE - current_shape
-        db_embedding.embeddings += [0.0] * remain
     db.add(db_embedding)
     await db.commit()
     # db.refresh()
