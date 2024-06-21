@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from models import *
 from vectorized_postgres_engine import *
 
-from src.utils.tokenizer import EMBEDDING_SHAPE
+from utils.tokenizer import EMBEDDING_SHAPE
 
 load_dotenv()
 

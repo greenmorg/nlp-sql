@@ -18,8 +18,9 @@ services:
     build: ./src
     command: python db/setup.py
     environment:
-      - HOST=db
-      - PORT=5432
+      - DB_HOST=db
+      - DB_PORT=5432
+      - PYTHONPATH=/src
     expose:
       - 8000
     links:

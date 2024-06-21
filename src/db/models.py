@@ -9,9 +9,9 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_co
 
 from dotenv import load_dotenv
 
-from src.db import schemas
-from src.db.vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
-from src.utils.tokenizer import broadcast, EMBEDDING_SHAPE
+import schemas
+from vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
+from utils.tokenizer import broadcast, EMBEDDING_SHAPE
 
 load_dotenv()
 
