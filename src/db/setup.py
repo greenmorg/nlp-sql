@@ -49,8 +49,8 @@ async def main():
         db_name = "database_schema"
     logger.info("DONE.")
     logger.info("Starting DB initialization...")
-    from models import EngineParams, Base
-    from vectorized_postgres_engine import get_vectorized_postgres_engine
+    from src.db.models import EngineParams, Base
+    from src.db.vectorized_postgres_engine import get_vectorized_postgres_engine
     from src.utils.tokenizer import EMBEDDING_SHAPE
     engine_params = EngineParams(host=host, port=port, user=user, password=password, db_name=db_name)
     engine = get_vectorized_postgres_engine(engine_params)
