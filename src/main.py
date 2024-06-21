@@ -9,12 +9,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import OperationalError
 
-from .api.models import *
-from .db.models import get_db, DBEmbedding, create_embedding
-from .db.schemas import EmbeddingSchema
-from .db.search import Searcher, EmbeddingSearchResult, StringSearchResult
-from .utils.fetcher import fetch_full_schema
-from .utils.tokenizer import text_to_embedding, embedding_to_text
+from src.api.models import *
+from src.db.models import get_db, DBEmbedding, create_embedding
+from src.db.schemas import EmbeddingSchema
+from src.db.search import Searcher, EmbeddingSearchResult, StringSearchResult
+from src.utils.fetcher import fetch_full_schema
+from src.utils.tokenizer import text_to_embedding, embedding_to_text
 
 origins = [
     "http://localhost",
