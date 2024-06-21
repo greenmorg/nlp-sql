@@ -5,10 +5,6 @@ import logging
 from sqlalchemy import text
 from dotenv import load_dotenv
 
-from models import *
-from vectorized_postgres_engine import *
-
-from utils.tokenizer import EMBEDDING_SHAPE
 
 load_dotenv()
 
@@ -44,6 +40,7 @@ async def main():
     user = os.environ.get("DB_USER")
     password = os.environ.get("DB_PASSWORD")
     db_name = os.environ.get("DB_NAME")
+    logger.info(f"PYTHONPATH = {os.environ.get('PYTHONPATH')}")
     print(host, port, user, password, db_name)
     if not (host and port): raise ValueError("The host and port should not be empty. Check you env file, please!")
     if not user:
@@ -52,6 +49,9 @@ async def main():
         db_name = "database_schema"
     logger.info("DONE.")
     logger.info("Starting DB initialization...")
+    from models import EngineParams, Base
+    from vectorized_postgres_engine import get_vectorized_postgres_engine
+    from src.utils.tokenizer import EMBEDDING_SHAPE
     engine_params = EngineParams(host=host, port=port, user=user, password=password, db_name=db_name)
     engine = get_vectorized_postgres_engine(engine_params)
 

@@ -9,16 +9,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import OperationalError
 
-from .models import *
-from ..db.models import get_db, DBEmbedding, create_embedding
-from ..db.schemas import EmbeddingSchema
-from ..db.search import Searcher, EmbeddingSearchResult, StringSearchResult
-from ..utils.fetcher import fetch_full_schema
-from ..utils.tokenizer import text_to_embedding, embedding_to_text
+from .api.models import *
+from .db.models import get_db, DBEmbedding, create_embedding
+from .db.schemas import EmbeddingSchema
+from .db.search import Searcher, EmbeddingSearchResult, StringSearchResult
+from .utils.fetcher import fetch_full_schema
+from .utils.tokenizer import text_to_embedding, embedding_to_text
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
 ]
@@ -32,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-templates = Jinja2Templates(directory="src/server/templates")
+templates = Jinja2Templates(directory="src/api/templates")
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):

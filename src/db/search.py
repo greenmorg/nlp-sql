@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import DBEmbedding
 
-from ..utils.types import embedding
-from ..utils.tokenizer import text_to_embedding, embedding_to_text
+from src.utils.types import embedding
+from src.utils.tokenizer import text_to_embedding, embedding_to_text
 
 class Distance(Enum):
     L1 = "l1_distance"

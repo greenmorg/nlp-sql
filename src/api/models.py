@@ -1,7 +1,4 @@
 from pydantic import BaseModel
-from fastapi.requests import Request
-
-# connection_string = 'postgresql://postgres:mysecretpassword@0.0.0.0:6432/postgres'
 
 class DatabaseDetails(BaseModel):
     host: str
