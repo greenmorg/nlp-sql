@@ -1,6 +1,6 @@
-import os
+import uvicorn
 
-from fastapi import Depends, FastAPI, Form, Request
+from fastapi import Depends, FastAPI, Form, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +15,7 @@ from src.db.schemas import EmbeddingSchema
 from src.db.search import Searcher, EmbeddingSearchResult, StringSearchResult
 from src.utils.fetcher import fetch_full_schema
 from src.utils.tokenizer import text_to_embedding, embedding_to_text
+from src.utils.openai_utils import generate_sql 
 
 origins = [
     "http://localhost",
@@ -87,12 +88,24 @@ async def get_search_page(request: Request):
     return templates.TemplateResponse("search.html", {"request": request})
 
 @app.post("/search")
-async def get_search_results(request: Request, schema_name: str = Form(...), user_prompt: str = Form(...), db: AsyncSession = Depends(get_db)):
+async def get_search_results(request: Request, user_prompt: str = Form(...), db: AsyncSession = Depends(get_db)):
     searcher = Searcher(db)
     similar_schemas: list[EmbeddingSearchResult] = await searcher.search(user_prompt)
-    print(f'similar schemas: {similar_schemas}')
+    # print(f'similar schemas: {similar_schemas}')
     similar_schemas: list[StringSearchResult] = [e.to_string_result() for e in similar_schemas]
     return {
         "schemas": [{"content": s.content} for s in similar_schemas]
     }
 
+@app.post("/generate_sql")
+async def generate_sql_endpoint(request: Request, user_prompt: str = Form(...), db: AsyncSession = Depends(get_db)):
+    search_results = await get_search_results(request, user_prompt=user_prompt, db=db)
+    schema_contents = [schema['content'] for schema in search_results['schemas']]
+    if not schema_contents:
+        raise HTTPException(status_code=404, detail="No relevant schemas found.")
+    combined_schemas = "\n".join(schema_contents)
+    sql_response = await generate_sql("SQL", combined_schemas, user_prompt)
+    return sql_response
+
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8000)

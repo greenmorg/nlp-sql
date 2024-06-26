@@ -9,9 +9,6 @@
 <body>
     <h1>Search for Schema</h1>
     <form hx-post="/search" hx-trigger="submit">
-        <label for="schema_name">Schema Name:</label>
-        <select id="schema_name" name="schema_name" required hx-get="/schemas" hx-trigger="load" hx-target="#schema_name">
-        </select>
         <label for="user_prompt">User Prompt:</label>
         <input type="text" id="user_prompt" name="user_prompt" required><br><br>
         <button type="submit">Search</button>

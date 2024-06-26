@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 from dataclasses import asdict
-
+from sqlalchemy import func
 from pgvector.sqlalchemy import Vector
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,7 @@ from src.db import schemas
 from src.db.vectorized_postgres_engine import get_vectorized_postgres_engine, EngineParams
 from src.utils.tokenizer import broadcast, EMBEDDING_SHAPE
 
-load_dotenv()
+load_dotenv('src/db/.env')
 
 HOST = os.environ.get("DB_HOST")
 PORT = os.environ.get("DB_PORT")
