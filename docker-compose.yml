@@ -16,11 +16,11 @@ services:
     depends_on:
       - db
     build: ./
-    command: python src/db/setup.py
+    command: ./start.sh
     environment:
       - DB_HOST=db
       - DB_PORT=5432
-    expose:
-      - 8000
+    ports:
+      - 8000:8000
     links:
       - db
