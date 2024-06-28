@@ -1,1 +1,1 @@
-embedding = list[int]
+embedding = list[float]

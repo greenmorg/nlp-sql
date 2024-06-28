@@ -1,6 +1,6 @@
 import tiktoken
 
-EMBEDDING_SHAPE = 1532
+EMBEDDING_SHAPE = 1536
 
 encoding = tiktoken.get_encoding("cl100k_base")
 

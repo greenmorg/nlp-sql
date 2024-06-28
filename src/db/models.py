@@ -41,6 +41,7 @@ class DBEmbedding(Base):
     id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column()
     embeddings: Mapped[Vector] = mapped_column(Vector(EMBEDDING_SHAPE))
+    text_schema: Mapped[str] = mapped_column()
 
     def to_dict(self):
         return asdict(self)
