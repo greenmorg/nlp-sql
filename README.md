@@ -63,8 +63,6 @@ Ensure that Docker and Docker Compose are installed on your system.
 
 ## Loading CSV Data into PostgreSQL
 
-To load data from a CSV file into the PostgreSQL database, follow these steps:
-
 1. **Ensure the CSV file is included in the repository:**
 
    The `backup.csv` file should be located in the root of the repository.
