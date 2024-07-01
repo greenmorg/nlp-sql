@@ -1,6 +1,5 @@
 #!/bin/sh
 echo "Starting database setup..."
-# Використання wait-for-it.sh для очікування доступності сервера бази даних
 ./wait-for-it.sh db:5432 --timeout=60 --strict -- python src/db/setup.py
 status=$?
 if [ $status -ne 0 ]; then
