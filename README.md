@@ -36,9 +36,9 @@ Ensure that Docker and Docker Compose are installed on your system.
    **`src/db/.env`:**
 
    ```env
-   POSTGRES_DB=
-   POSTGRES_USER=
-   POSTGRES_PASSWORD=
+   DB_USER=
+   DB_PASSWORD=
+   DB_NAME=
    DB_HOST=
    DB_PORT=
    ```
