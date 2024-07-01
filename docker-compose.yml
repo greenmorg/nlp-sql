@@ -16,7 +16,7 @@ services:
     depends_on:
       - db
     build: ./
-    command: ./start.sh
+    command: /app/start.sh
     environment:
       - DB_HOST=db
       - DB_PORT=5432
